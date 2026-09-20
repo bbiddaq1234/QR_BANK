@@ -94,6 +94,7 @@
     $('outOwner').textContent = o.owner || '-';
     $('outAccount').textContent = o.shown;
     renderQR(qrText(o));
+    $('linkBtn').hidden = !COPY_PAGE_URL;  // 호스팅 전에는 복사할 링크가 없다
     formCard.hidden = true;
     resultCard.hidden = false;
     resultCard.scrollIntoView({ block: 'start' });
@@ -154,6 +155,16 @@
     copyText(state.digits).then(
       function () { toast('계좌번호가 복사되었습니다.'); },
       function () { toast('복사에 실패했습니다. 계좌번호를 길게 눌러 복사해주세요.'); }
+    );
+  });
+
+  // QR이 담고 있는 것과 똑같은 링크를 복사한다. 카톡 등에 붙여넣으면 상대는
+  // QR을 찍지 않고도 copy.html 로 바로 이동한다.
+  $('linkBtn').addEventListener('click', function () {
+    if (!state || !COPY_PAGE_URL) return;
+    copyText(qrText(state)).then(
+      function () { toast('QR 링크가 복사되었습니다.'); },
+      function () { toast('복사에 실패했습니다. 다시 시도해주세요.'); }
     );
   });
 
