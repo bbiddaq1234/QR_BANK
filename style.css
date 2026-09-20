@@ -1,0 +1,280 @@
+/* playful — 두꺼운 테두리 + 하드 섀도우(스티커 느낌) + 밝은 색.
+   외부 폰트는 쓰지 않는다: 네트워크 요청 0을 지키기 위해 시스템 폰트만 사용. */
+
+:root {
+  --violet: #6d4aff;
+  --violet-deep: #4f2fd1;
+  --mint: #00c2a8;
+  --sunny: #ffd23f;
+  --coral: #ff6b6b;
+
+  --ink: #201b33;
+  --bg: #fff6e9;
+  --card: #ffffff;
+  --muted: #6b6480;
+  --line: var(--ink);
+  --danger: #d6336c;
+
+  --radius: 22px;
+  --border: 3px;
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #0d0a18;
+    --bg: #1b1630;
+    --card: #2a2348;
+    --muted: #b9b1d6;
+    --line: #0d0a18;
+    --danger: #ff8fb1;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  /* 은은한 도트 패턴 — 이미지 없이 CSS만으로 */
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(109, 74, 255, .16) 0 26%, transparent 26%),
+    radial-gradient(circle at 88% 8%, rgba(0, 194, 168, .16) 0 22%, transparent 22%),
+    radial-gradient(circle at 78% 92%, rgba(255, 210, 63, .20) 0 24%, transparent 24%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+               "Pretendard", "Malgun Gothic", sans-serif;
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  body { color: #f4f0ff; }
+}
+
+.wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 16px calc(48px + env(safe-area-inset-bottom));
+}
+
+/* ---- 헤더 ---- */
+
+.head { text-align: center; margin-bottom: 18px; }
+
+.head h1 {
+  display: inline-block;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  padding: 6px 18px;
+  color: #fff;
+  background: var(--violet);
+  border: var(--border) solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  transform: rotate(-2deg);
+}
+
+.sub { margin: 0; color: var(--muted); font-size: 15px; font-weight: 600; }
+
+.notice {
+  margin: 18px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--sunny);
+  border: var(--border) solid var(--line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  transform: rotate(.6deg);
+}
+
+/* ---- 카드 ---- */
+
+.card {
+  background: var(--card);
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.field { margin-bottom: 18px; }
+
+.field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.opt { color: var(--muted); font-weight: 600; }
+
+input, select {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 14px;
+  font-size: 17px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: var(--border) solid var(--line);
+  border-radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  input, select { background: #f4f0ff; }
+  .card, .notice, .head h1 { box-shadow: 6px 6px 0 rgba(0, 0, 0, .55); }
+}
+
+input::placeholder { color: var(--muted); font-weight: 600; }
+
+input:focus-visible, select:focus-visible, .btn:focus-visible {
+  outline: 3px solid var(--mint);
+  outline-offset: 3px;
+}
+
+.hint { margin: 7px 2px 0; font-size: 12px; font-weight: 600; color: var(--muted); }
+
+.error {
+  margin: 0 0 12px;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 22px;
+}
+
+/* ---- 버튼 ---- */
+
+.btn {
+  display: block;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: var(--border) solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform .08s, box-shadow .08s;
+}
+/* 눌리면 그림자 쪽으로 쑥 — 물리 버튼 느낌 */
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--line); }
+
+.btn.primary { background: var(--violet); color: #fff; }
+.btn.primary:active { background: var(--violet-deep); }
+
+.btn.ghost { background: var(--card); color: var(--muted); }
+
+.btn.danger-text {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--danger);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  min-height: 44px;              /* 터치 영역은 유지 */
+}
+.btn.danger-text:active { transform: none; box-shadow: none; }
+
+/* ---- QR ---- */
+
+.qrbox { display: flex; justify-content: center; }
+
+/* QR은 기울이지 않는다 — 스캔 정확도가 우선 */
+#qr {
+  background: #fff;
+  padding: 14px;
+  border: var(--border) solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  line-height: 0;
+}
+#qr canvas { display: block; width: 220px; height: 220px; }
+
+.ok {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--mint);
+  border: var(--border) solid var(--line);
+  border-radius: 999px;
+  padding: 5px 14px;
+  width: fit-content;
+  margin: 18px auto 0;
+}
+
+.info {
+  margin: 18px 0 20px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 16px;
+  border-top: var(--border) dashed var(--line);
+  padding-top: 18px;
+}
+.info dt { color: var(--muted); font-size: 14px; font-weight: 700; }
+.info dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  text-align: right;
+  word-break: break-all;
+}
+
+.actions { display: grid; gap: 12px; }
+
+.warn {
+  margin: 20px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.foot {
+  margin-top: 26px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---- 토스트 ---- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(8px);
+  background: var(--coral);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 12px 20px;
+  border: var(--border) solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s, transform .18s;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .btn:active { transform: none; }
+  .head h1, .notice { transform: none; }
+}

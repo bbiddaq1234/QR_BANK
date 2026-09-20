@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>계좌 QR</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="head">
+    <h1>계좌 QR</h1>
+    <p class="sub">내 계좌번호를 QR 코드로 간편하게 공유하세요.</p>
+  </header>
+
+  <p class="notice">
+    입력한 계좌정보는 QR 코드 생성을 위해 이 기기에서만 처리되며 서버에 저장하지 않습니다.
+  </p>
+
+  <!-- 입력 -->
+  <section class="card" id="formCard">
+    <form id="form" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="bank">은행</label>
+        <select id="bank" name="bank">
+          <option value="">은행을 선택하세요</option>
+          <option>KB국민은행</option>
+          <option>신한은행</option>
+          <option>우리은행</option>
+          <option>하나은행</option>
+          <option>NH농협은행</option>
+          <option>IBK기업은행</option>
+          <option>카카오뱅크</option>
+          <option>토스뱅크</option>
+          <option>케이뱅크</option>
+          <option>SC제일은행</option>
+          <option>부산은행</option>
+          <option>대구은행</option>
+          <option>경남은행</option>
+          <option>광주은행</option>
+          <option>전북은행</option>
+          <option>제주은행</option>
+          <option>새마을금고</option>
+          <option>신협</option>
+          <option>우체국</option>
+          <option>기타</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="account">계좌번호</label>
+        <input id="account" name="account" type="text" inputmode="numeric"
+               placeholder="계좌번호를 입력하세요" maxlength="30"
+               autocomplete="off" autocorrect="off" spellcheck="false">
+        <p class="hint">하이픈(-)을 넣어도 자동으로 정리됩니다.</p>
+      </div>
+
+      <div class="field">
+        <label for="owner">예금주 <span class="opt">(선택)</span></label>
+        <input id="owner" name="owner" type="text"
+               placeholder="예금주 이름을 입력하세요" maxlength="30"
+               autocomplete="off" spellcheck="false">
+      </div>
+
+      <p class="error" id="error" role="alert"></p>
+
+      <button class="btn primary" type="submit">QR 생성하기</button>
+    </form>
+  </section>
+
+  <!-- 결과: 복사가 주인공, QR은 보조 -->
+  <section class="card result" id="resultCard" hidden>
+    <p class="who"><span id="outBank"></span> <span id="outOwner"></span></p>
+
+    <p class="account" id="outAccount"></p>
+
+    <p class="ok" id="valid" hidden></p>
+
+    <button class="btn primary big" type="button" id="copyBtn">계좌번호 복사</button>
+    <p class="hint center">복사한 뒤 은행 앱의 계좌번호 칸에 붙여넣으세요.</p>
+
+    <hr class="split">
+
+    <h2 class="qrhead">QR로 전달하기</h2>
+    <div class="qrbox">
+      <div id="qr" role="img" aria-label="이 QR 코드는 계좌번호를 포함하고 있습니다."></div>
+    </div>
+    <p class="hint center">
+      스캔하면 복사 페이지가 열리고, 버튼 한 번으로 계좌번호가 클립보드에 들어갑니다.
+      <br><code>app.js</code>의 <code>COPY_PAGE_URL</code>이 비어 있으면
+      QR에 숫자만 담기고 스캐너가 검색창으로 넘어갈 수 있습니다.
+    </p>
+
+    <div class="actions">
+      <button class="btn" type="button" id="saveBtn">QR 이미지 저장</button>
+      <button class="btn" type="button" id="shareBtn">공유하기</button>
+      <button class="btn ghost" type="button" id="againBtn">다시 입력</button>
+    </div>
+
+    <p class="warn">
+      QR 코드에는 계좌번호가 그대로 들어 있습니다.
+      QR 이미지를 다른 사람에게 공유할 때는 계좌정보 공개에 주의하세요.
+    </p>
+  </section>
+
+  <button class="btn danger-text" type="button" id="clearBtn">전체 삭제</button>
+
+  <footer class="foot">
+    이 앱은 계좌정보를 QR로 표현하는 도구입니다. 송금 기능이 아닙니다.
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

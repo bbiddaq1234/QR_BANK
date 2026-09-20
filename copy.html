@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+  QR을 스캔한 폰이 여는 페이지. 계좌정보는 URL의 # 뒤(fragment)에 들어 있고,
+  fragment는 서버로 전송되지 않으므로 어떤 호스팅에 올려도 서버 로그에 남지 않는다.
+  이 한 파일만 https에 올리면 된다. 외부 요청 없음, 저장소 사용 없음.
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>계좌번호 복사</title>
+<style>
+  :root { color-scheme: light dark; --bg:#f6f7f9; --card:#fff; --fg:#15181d; --sub:#666d78;
+          --line:#e3e6ea; --accent:#2f6df6; --accent-fg:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14171c; --card:#1d2128; --fg:#eef1f5; --sub:#9aa3af; --line:#2c323b; --accent:#5b8cff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); min-height:100vh;
+         display:flex; align-items:center; justify-content:center; padding:20px;
+         font:16px/1.6 system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px;
+          padding:24px; width:100%; max-width:380px; text-align:center; }
+  h1 { font-size:17px; margin:0 0 18px; color:var(--sub); font-weight:600; }
+  .meta { color:var(--sub); font-size:15px; margin:0 0 6px; }
+  .num { font-size:26px; font-weight:700; letter-spacing:.5px; word-break:break-all;
+         margin:0 0 20px; -webkit-user-select:all; user-select:all; }
+  button { width:100%; padding:16px; font-size:17px; font-weight:600; border:0; border-radius:12px;
+           background:var(--accent); color:var(--accent-fg); cursor:pointer; font-family:inherit; }
+  button:active { opacity:.85; }
+  .hint { color:var(--sub); font-size:13px; margin:14px 0 0; }
+  .err { color:#d33; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>계좌번호 복사</h1>
+  <p class="meta" id="meta"></p>
+  <p class="num" id="num">—</p>
+  <button type="button" id="btn">계좌번호 복사</button>
+  <p class="hint" id="hint">버튼을 누르면 숫자만 클립보드에 복사됩니다.</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var numEl = document.getElementById('num'), metaEl = document.getElementById('meta');
+  var btn = document.getElementById('btn'), hint = document.getElementById('hint');
+
+  // #a=계좌번호&b=은행&o=예금주
+  function parseHash(hash) {
+    var out = {};
+    String(hash).replace(/^#/, '').split('&').forEach(function (pair) {
+      if (!pair) return;
+      var i = pair.indexOf('=');
+      if (i < 0) return;
+      try { out[pair.slice(0, i)] = decodeURIComponent(pair.slice(i + 1).replace(/\+/g, ' ')); }
+      catch (e) { /* 깨진 인코딩은 무시 */ }
+    });
+    return out;
+  }
+
+  // 계좌번호가 없으면 아래에서 일찍 빠져나가므로, 셀프체크는 그 전에 돌린다.
+  if (location.search.indexOf('selftest') !== -1) {
+    var eq = function (a, b, label) {
+      if (a !== b) throw new Error(label + ': ' + JSON.stringify(a) + ' !== ' + JSON.stringify(b));
+    };
+    eq(parseHash('#a=123&b=%EC%B9%B4%EC%B9%B4%EC%98%A4%EB%B1%85%ED%81%AC').b, '카카오뱅크', 'decode bank');
+    eq(parseHash('#a=3333123456789').a, '3333123456789', 'decode account');
+    eq(parseHash('').a, undefined, 'empty hash');
+    eq(parseHash('#a=%E0%A4%A').a, undefined, 'broken encoding ignored');
+    console.log('copy selftest: 4 passed');
+  }
+
+  var q = parseHash(location.hash);
+  var digits = (q.a || '').replace(/[\s-]/g, '');
+
+  if (!/^[0-9]{8,20}$/.test(digits)) {
+    numEl.textContent = '계좌번호 없음';
+    hint.textContent = 'QR 코드를 다시 스캔해주세요.';
+    hint.className = 'hint err';
+    btn.disabled = true;
+    return;
+  }
+
+  numEl.textContent = digits;
+  metaEl.textContent = [q.b, q.o].filter(Boolean).join(' · ');
+  document.title = digits;
+
+  // 모바일 브라우저는 사용자 제스처 없이는 클립보드 쓰기를 막는다. 그래서 버튼이 필요하다.
+  function copy(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('copy failed'));
+    });
+  }
+
+  btn.addEventListener('click', function () {
+    copy(digits).then(function () {
+      btn.textContent = '복사됐습니다 ✓';
+      hint.textContent = '은행 앱 계좌번호 칸에 붙여넣으세요.';
+      hint.className = 'hint';
+      setTimeout(function () { btn.textContent = '계좌번호 복사'; }, 2500);
+    }, function () {
+      hint.textContent = '복사에 실패했습니다. 위 숫자를 길게 눌러 복사해주세요.';
+      hint.className = 'hint err';
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
